@@ -1,0 +1,123 @@
+.register-page {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 40px;
+    background-color: #f9f9f9;
+}
+
+.register-info {
+    flex: 1;
+    max-width: 50%;
+    text-align: center;
+}
+
+.register-info h1 {
+    font-size: 2.5rem;
+    color: #FF6F00;
+    margin-bottom: 15px;
+}
+
+.register-info p {
+    font-size: 1.2rem;
+    color: #333;
+    line-height: 1.5;
+}
+
+.info-image {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.register-form-container {
+    flex: 1;
+    max-width: 450px;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.register-header h2 {
+    font-size: 26px;
+    color: #333;
+}
+
+.register-header p {
+    font-size: 14px;
+    color: #666;
+}
+
+.register-header .login-link {
+    color: #FF6F00;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.register-header .login-link:hover {
+    color: #e65c00;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+}
+
+.form-control.error {
+    border-color: #e74c3c;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #FF6F00;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #e65c00;
+}
+
+.message {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #28a745;
+    text-align: center;
+}

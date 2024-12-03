@@ -1,0 +1,77 @@
+/* Forbidden.css */
+.forbidden-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(150deg, #dc5635, #feb47b);
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+}
+
+.forbidden-content {
+    max-width: 500px;
+    background: rgba(17, 10, 10, 0.1);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 20px 20px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
+}
+
+.forbidden-title {
+    font-size: 5rem;
+    margin: 0;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.forbidden-subtitle {
+    font-size: 2rem;
+    margin: 0.5rem 0;
+    color: #f7f5f1;
+}
+
+.forbidden-text {
+    font-size: 1rem;
+    margin: 1rem 0;
+    line-height: 1.6;
+    color: #f7efeb;
+}
+
+.forbidden-button {
+    margin-top: 1rem;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    background: #2a254e;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.forbidden-button:hover {
+    background: #e63946;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.forbidden-button:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

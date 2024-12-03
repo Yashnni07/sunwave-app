@@ -1,0 +1,237 @@
+.content-wrapper {
+  padding: 2rem;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.month-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.page-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem; /* Increased space below badge */
+  padding-top: 2rem;
+}
+
+.status-title {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #ff5722;
+  color: white;
+  border-radius: 2rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  align-items: center;
+}
+
+/* Events List */
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 1rem;
+}
+
+.event-card {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* Date Box */
+.date-box {
+  background-color: #f97316;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+  min-width: 120px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
+}
+
+.date-month {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.date-day {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0.25rem 0;
+}
+
+.date-name {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.event-time-box {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 0.5rem;
+  color: white;
+}
+
+/* Event Details Container */
+.event-content {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  flex-grow: 1;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.event-content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.15);
+}
+
+.event-details {
+  flex: 1;
+  min-width: 0; /* Prevents flex item from overflowing */
+}
+
+.event-type {
+  display: inline-block;
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  background-color: #f3f4f6;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.event-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  color: #1f2937;
+}
+
+.event-description {
+  color: #4b5563;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-clamp: 3;
+}
+
+.details-button {
+  margin-top: 1rem;
+  padding: 0.5rem 2rem;
+  background-color: #1e293b;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  height: 2.5rem;
+  min-width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.details-button:hover {
+  background-color: #334155;
+  transform: translateY(-1px);
+}
+
+.details-button:active {
+  transform: translateY(0);
+}
+
+/* Event Image */
+.event-image-container {
+  flex-shrink: 0;
+  width: 8rem;
+  height: 16rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.event-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.event-image:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .event-card {
+    flex-direction: column;
+  }
+
+  .event-content {
+    flex-direction: column-reverse;
+  }
+
+  .event-image-container {
+    width: 100%;
+    height: 12rem;
+  }
+}
+
+/* Loading States */
+.event-card.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.details-button.loading {
+  position: relative;
+  overflow: hidden;
+  cursor: wait;
+}
+
+.details-button.loading::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

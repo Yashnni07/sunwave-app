@@ -1,0 +1,95 @@
+.otp-container {
+    text-align: center;
+    width: 320px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.otp-container h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.otp-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+}
+
+.otp-container p {
+    font-size: 16px;
+    color: #333;
+    margin: 5px 0;
+}
+
+.otp-input-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.otp-input-container input {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.otp-input-container input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+.verify-button {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 16px;
+    color: #fff !important;
+    background-color: #FF6F00 !important;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.verify-button:hover {
+    background-color: #e65c00 !important;
+}
+
+.message {
+    margin-top: 10px;
+    font-size: 12px !important;
+    color: red !important;
+    text-align: center;
+}
+
+.resend-container {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+}
+
+.resend-container button {
+    background: none;
+    border: none;
+    color: #FF6F00;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.resend-container button:disabled {
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+    

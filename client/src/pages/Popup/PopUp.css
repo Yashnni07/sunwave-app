@@ -1,0 +1,35 @@
+.popup-overlay {
+    position: fixed; /* Keep the overlay in place while scrolling */
+    top: 0;
+    left: 0;
+    width: 100%; /* Cover the entire screen */
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    display: flex;
+    justify-content: center; /* Center the modal horizontally */
+    align-items: center; /* Center the modal vertically */
+    z-index: 1000; /* Ensure it appears above all other elements */
+}
+
+.popup-content {
+    background: #fff; /* White modal background */
+    padding: 20px; /* Add padding inside the modal */
+    border-radius: 15px; /* Rounded corners */
+    width: 40%; /* Fixed width */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    position: relative; /* For the close button placement */
+}
+
+.popup-close-button {
+    position: absolute; /* Position the button on top-right */
+    top: 20px;
+    right: 20px;
+    background: none; /* Remove default button background */
+    border: none; /* Remove default button border */
+    font-size: 18px; /* Size of the close (✖) icon */
+    cursor: pointer;
+}
+
+.popup-close-button:hover {
+    color: black; /* Highlight the close button when hovered */
+}

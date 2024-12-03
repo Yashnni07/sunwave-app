@@ -1,0 +1,127 @@
+.upload-event-container {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.upload-event-title {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.upload-event-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.upload-event-form input,
+.upload-event-form textarea {
+    width: 97.5%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: Arial, sans-serif;
+}
+
+.date-time-container {
+    width: 98.5%;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.date-time-container div {
+    flex: 1;
+}
+
+textarea {
+    resize: none;
+    min-height: 100px;
+}
+
+.upload-image-container {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    justify-content: center;
+    width: 100.25%;
+    height: 200px;
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    background-color: #fff;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+}
+
+.upload-placeholder span {
+    font-size: 2rem;
+    padding-top: 55px;
+    font-weight: bold;
+    color: #888;
+}
+
+.upload-placeholder p {
+    margin: 0;
+    padding-top: 10px;
+    font-size: 1rem;
+}
+
+.image-preview {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.image-upload-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-event-button {
+    background-color: #ff5722;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+.upload-event-button:hover {
+    background-color: #f46f46;
+}
+
+.error-text {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: -2px; /* Slightly overlaps the element it's validating */
+    margin-bottom: 15px; /* Adds space after the error text */
+    display: block; /* Ensure it's on a new line */
+}

@@ -1,0 +1,115 @@
+.comment-sec-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.comment-sec-content {
+    background: white;
+    border-radius: 20px 20px 0px 0px;
+    width: 60%;
+    max-height: 80%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.comment-sec-header {
+    display: flex;
+    flex-direction: row; /* Default for flexbox, aligns items horizontally */
+    justify-content: space-between; /* Distribute space between items */
+    align-items: center; /* Vertically align items to the center */
+    width: 100%; /* Optional, ensure the container spans full width */
+}
+
+.comment-sec-header h2 {
+    margin: auto;
+    width: 95%;
+    text-align: center;
+}
+
+.close-btn {
+    margin: auto;
+    width: 5%;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.comment-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.comment-item {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 10px;
+    width: 95%;
+}
+
+.comment-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.username {
+    font-weight: bold;
+    margin-bottom: 5px
+}
+
+.student-id {
+    color: #777;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.comment-content {
+    width: max-content;
+    padding: 10px;
+    margin: 0px 0px 0px 40px;
+    text-align: justify;
+    background-color: #e8e7e7;
+    border-radius: 20px;
+}
+
+.add-comment-section {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.comment-input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    margin-right: 10px;
+}
+
+.add-comment-btn {
+    background-color: #fff;
+    border: 2px solid rgb(213, 213, 213);
+    border-radius: 20%;
+    align-self: right;
+    font-size: 40px;
+    cursor: pointer;
+    margin-right: 10px;
+}

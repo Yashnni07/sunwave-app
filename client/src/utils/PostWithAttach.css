@@ -1,0 +1,25 @@
+.post-with-attachment {
+    background: #fff;
+    width: 100%;
+    margin: 10px 0px 0px 0px;
+}
+
+textarea {
+    width: 100%;
+    font-size: 14px;
+    resize: none; /* Prevent resizing */
+}
+
+label {
+    font-size: 14px;
+    cursor: pointer;
+}
+
+button {
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0069d9; /* Darker blue for hover effect */
+}

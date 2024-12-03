@@ -1,0 +1,114 @@
+/* General Container */
+.created-events-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* Table Styling */
+  .events-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    text-align: left;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .events-table thead th {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .events-table tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .events-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .events-table tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Section Heading */
+  .section-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Subheading */
+  .subheading {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  /* Actions Buttons */
+  .actions-container button {
+    margin: 0 5px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  /* Button Styles */
+  .view-users-btn, .show-results-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+  }
+  
+  .view-users-btn:hover, .show-results-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .close-button {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  .modal-container.voting-results {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Add spacing between options */
+  }
+  
+  .vote-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .vote-option {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px; /* Add a bit of space below the option name */
+  }
+  
+  .vote-list {
+    margin-top: 5px;
+    padding-left: 20px;
+    list-style-type: disc;
+  }
+  

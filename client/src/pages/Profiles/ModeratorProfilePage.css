@@ -1,0 +1,211 @@
+/* General Styling */
+.profile-page {
+  padding: 40px;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
+  background-color: #f8f9fc;
+  border-radius: 16px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* Header Section */
+.profile-header {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 50px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-header::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, #ff7e00, #0068f0);
+  border-radius: 50%;
+  opacity: 0.2;
+}
+
+.profile-header::after {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  left: -100px;
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, #0068f0, #ffae00);
+  border-radius: 50%;
+  opacity: 0.1;
+}
+
+.profile-picture img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  margin-right: 30px;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.profile-picture img:hover {
+  transform: scale(1.1);
+}
+
+.user-details {
+  flex: 1;
+  z-index: 1;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+.detail-row span {
+  flex: 1;
+  text-align: left;
+  font-size: 15px;
+  color: #2c3e50;
+}
+
+.detail-row strong {
+  color: #0068f0;
+  font-weight: 700;
+}
+
+/* Editable Dropdown Styling */
+select {
+  padding: 6px;
+  border: 2px solid #f0f2f5;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #2c3e50;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+select:focus {
+  border-color: #0068f0;
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 104, 240, 0.3);
+}
+
+/* Buttons */
+.btn-edit, .btn-save {
+  margin-top: 20px;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: bold;
+  color:#f7f7f7;
+  background:#0364ff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-edit:hover, .btn-save:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 15px 30px rgba(63, 127, 211, 0.3);
+}
+
+/* Monitoring Section */
+.profile-monitoring {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+  margin-top: 40px;
+}
+
+.profile-monitoring h2 {
+  margin-bottom: 30px;
+  font-size: 20px;
+  color: #2c3e50;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.monitoring-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.monitoring-card {
+  width: 260px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border: none;
+  border-radius: 20px;
+  background-color: #f4f8fe;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.monitoring-card img {
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.monitoring-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 12px 25px rgba(0, 104, 240, 0.3);
+}
+
+.monitoring-card:hover img {
+  transform: scale(1.1);
+}
+
+.monitoring-card p {
+  font-size: 17px;
+  font-weight: bold;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.monitoring-card span {
+  font-size: 30px;
+  font-weight: bold;
+  color: #0068f0;
+}
+
+/* Profile Update Message */
+.profile-message {
+  margin-top: 20px;
+  padding: 12px 25px;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #0068f0;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+}
