@@ -1,0 +1,294 @@
+// Function to fetch user by email and return their saved posts
+async fetchSavedPosts(ctx, userEmail) {
+    const userAsBytes = await this.fetchUserByEmail(ctx, userEmail); // Use existing function to fetch user by email
+    if (!userAsBytes) {
+        throw new Error(`User with email ${userEmail} not found`);
+    }
+
+    const user = JSON.parse(userAsBytes); // Parse the user data
+
+    // Return the savedPosts of the user
+    return JSON.stringify({ savedPosts: user.savedPosts || [] });
+}
+
+// Function to remove a saved post from the user's savedPosts
+async removeSavedPost(ctx, userEmail, postId) {
+    const userAsBytes = await this.fetchUserByEmail(ctx, userEmail); // Fetch the user by email
+    if (!userAsBytes) {
+        throw new Error(`User with email ${userEmail} not found`);
+    }
+
+    const user = JSON.parse(userAsBytes); // Parse the user data
+
+    // Find and remove the post from savedPosts
+    const updatedSavedPosts = user.savedPosts.filter((p) => p._id !== postId);
+
+    // Update the user's data with the modified savedPosts
+    user.savedPosts = updatedSavedPosts;
+
+    // Save the updated user object back to the blockchain
+    await ctx.stub.putState(userEmail, Buffer.from(JSON.stringify(user)));
+
+    return JSON.stringify({ message: 'Saved post removed successfully' });
+}
+
+// Function to update the user data (called after removing the post)
+async updateUser(ctx, userEmail, userJson) {
+    const user = JSON.parse(userJson);
+    await ctx.stub.putState(userEmail, Buffer.from(JSON.stringify(user)));
+}
+
+// Delete post and update savedPosts
+async deletePost(ctx, postId) {
+    // Fetch the post data
+    const postAsBytes = await ctx.stub.getState(postId);
+    if (!postAsBytes || postAsBytes.length === 0) {
+      return JSON.stringify({ error: `Post with ID ${postId} not found` });
+    }
+  
+    const post = JSON.parse(postAsBytes.toString()); // Parse the post object
+  
+    // Delete the post from the blockchain
+    await ctx.stub.deleteState(postId);
+  
+    // Fetch all users and remove references to the deleted post from savedPosts
+    const usersIterator = await ctx.stub.getStateByRange('', '');
+    let users = [];
+    while (true) {
+      const user = await usersIterator.next();
+      if (user.value === undefined) {
+        break;
+      }
+      users.push(JSON.parse(user.value.toString()));
+    }
+  
+    // Update all users' savedPosts
+    const userUpdates = users.map(async (user) => {
+      const updatedSavedPosts = (user.savedPosts || []).filter((savedPost) => savedPost._id !== postId);
+      user.savedPosts = updatedSavedPosts;
+  
+      // Update the user data with the modified savedPosts
+      await ctx.stub.putState(user.email, Buffer.from(JSON.stringify(user)));
+    });
+  
+    await Promise.all(userUpdates);
+  
+    // Return success message
+    return JSON.stringify({ message: 'Post deleted and references removed from saved posts.' });
+}
+
+// Flag a post
+async flagPost(ctx, postId, userEmail) {
+    // Fetch the post from the blockchain
+    const postAsBytes = await ctx.stub.getState(postId);
+    if (!postAsBytes || postAsBytes.length === 0) {
+      throw new Error(`Post with ID ${postId} not found`);
+    }
+  
+    const post = JSON.parse(postAsBytes.toString()); // Parse the post object
+  
+    // Check if the user has already flagged the post
+    if (post.flaggedBy && post.flaggedBy.includes(userEmail)) {
+      throw new Error(`Post has already been flagged by the user ${userEmail}`);
+    }
+  
+    // Add the user to the flaggedBy array and update flagVerified and flagCount
+    post.flaggedBy = [...(post.flaggedBy || []), userEmail];
+    post.flagVerified = true; // Mark the post as flagged
+    post.flagCount = post.flaggedBy.length; // Update the flag count
+  
+    // Save the updated post back to the blockchain
+    await ctx.stub.putState(postId, Buffer.from(JSON.stringify(post)));
+  
+    return JSON.stringify({ message: 'Post flagged successfully' });
+}
+
+// Fetch Flagged Posts
+async fetchFlaggedPosts(ctx) {
+    const allPostsIterator = await ctx.stub.getStateByRange('', ''); // Get all posts in the state
+    const flaggedPosts = [];
+  
+    // Iterate over all posts and filter by flagVerified
+    while (true) {
+      const res = await allPostsIterator.next();
+      if (res.value && res.value.value.toString()) {
+        const post = JSON.parse(res.value.value.toString());
+  
+        // Check if the post is flagged
+        if (post.flagVerified) {
+          flaggedPosts.push(post);
+        }
+      }
+  
+      if (res.done) {
+        await allPostsIterator.close();
+        break;
+      }
+    }
+  
+    return JSON.stringify(flaggedPosts); // Return the flagged posts as a JSON string
+}
+
+// Delete Flagged Post and Update Users' Saved Posts
+async deleteFlaggedPost(ctx, postId) {
+    // Fetch the post to be deleted
+    const postAsBytes = await ctx.stub.getState(postId);
+    if (!postAsBytes || postAsBytes.length === 0) {
+      throw new Error(`Post with ID ${postId} not found`);
+    }
+  
+    const post = JSON.parse(postAsBytes.toString());
+  
+    // Delete the post from the blockchain
+    await ctx.stub.deleteState(postId);
+  
+    // Fetch all users to remove the post from saved posts
+    const allUsersIterator = await ctx.stub.getStateByRange('', '');
+    while (true) {
+      const res = await allUsersIterator.next();
+      if (res.value && res.value.value.toString()) {
+        const user = JSON.parse(res.value.value.toString());
+  
+        // Check if the user has saved posts
+        if (user.savedPosts) {
+          // Filter out the post from saved posts
+          user.savedPosts = user.savedPosts.filter((savedPost) => savedPost._id !== postId);
+  
+          // Update the user with the modified savedPosts
+          await ctx.stub.putState(user.email, Buffer.from(JSON.stringify(user)));
+        }
+      }
+  
+      if (res.done) {
+        await allUsersIterator.close();
+        break;
+      }
+    }
+  
+    return JSON.stringify({ message: 'Flagged post deleted and references removed from users' });
+}
+
+// Create an event (for voting and normal events)
+async createEvent(ctx, eventDetails, eventDateCreated) {
+    const event = JSON.parse(eventDetails);
+  
+    const eventId = ctx.stub.getTxID(); // Use transaction ID as event ID
+    event.id = eventId;  // Assign event ID
+    event.dateCreated = eventDateCreated; // Use the event date passed from the server
+  
+    // Store the event in the ledger
+    await ctx.stub.putState(eventId, Buffer.from(JSON.stringify(event)));
+  
+    return eventId;
+}
+
+// Update user's "myEvents" attribute after event creation
+async updateUserEvents(ctx, userEmail, updatedMyEvents) {
+    const userAsBytes = await ctx.stub.getState(userEmail);
+    if (!userAsBytes || userAsBytes.length === 0) {
+      throw new Error(`User with email ${userEmail} not found`);
+    }
+  
+    const user = JSON.parse(userAsBytes.toString());
+    user.myEvents = updatedMyEvents;  // Update the user's events list
+  
+    // Save the updated user object back to the blockchain
+    await ctx.stub.putState(userEmail, Buffer.from(JSON.stringify(user)));
+  
+    return JSON.stringify({ message: 'User events updated successfully' });
+}
+
+// Fetch normal events created by a user
+async fetchNormalEventsByUser(ctx, userEmail) {
+    const query = {
+      selector: {
+        createdBy: userEmail,
+        eventType: 'normal', // Only normal events
+      },
+    };
+  
+    const resultsIterator = await ctx.stub.getQueryResult(JSON.stringify(query));
+  
+    const events = [];
+    while (true) {
+      const res = await resultsIterator.next();
+      if (res.done) {
+        await resultsIterator.close();
+        break;
+      }
+  
+      const event = JSON.parse(res.value.value.toString());
+      events.push({
+        _id: res.value.key,
+        title: event.title,
+        date: event.date,
+        time: event.time,
+        location: event.location,
+        totalJoined: event.totalJoined || 0,
+        joinedUsers: event.joinedUsers || [],
+      });
+    }
+  
+    return JSON.stringify({ events });
+  }
+  
+  // Fetch voting events created by a user
+  async fetchVotingEventsByUser(ctx, userEmail) {
+    const query = {
+      selector: {
+        createdBy: userEmail,
+        eventType: 'voting', // Only voting events
+      },
+    };
+  
+    const resultsIterator = await ctx.stub.getQueryResult(JSON.stringify(query));
+  
+    const events = [];
+    while (true) {
+      const res = await resultsIterator.next();
+      if (res.done) {
+        await resultsIterator.close();
+        break;
+      }
+  
+      const event = JSON.parse(res.value.value.toString());
+      events.push({
+        _id: res.value.key,
+        title: event.title,
+        date: event.date,
+        time: event.time,
+        location: event.location,
+        voteOptions: event.voteOptions || [],
+      });
+    }
+  
+    return JSON.stringify({ events });
+}
+
+// Fetch event by eventId
+async fetchEventById(ctx, eventId) {
+    const eventAsBytes = await ctx.stub.getState(eventId);
+    if (!eventAsBytes || eventAsBytes.length === 0) {
+      throw new Error(`Event with ID ${eventId} not found`);
+    }
+    return eventAsBytes.toString();
+}
+
+// Fetch voting event by ID (eventId)
+async fetchVotingEventById(ctx, eventId) {
+    const eventAsBytes = await ctx.stub.getState(eventId);
+    if (!eventAsBytes || eventAsBytes.length === 0) {
+      throw new Error(`Voting event with ID ${eventId} not found`);
+    }
+    return eventAsBytes.toString();  // Return the event object as a string
+}
+  
+  
+
+
+
+  
+  
+  
+  
+  
