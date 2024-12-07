@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./CreatedEvent.css";
+import { jwtDecode } from "jwt-decode";
 
 const CreatedEvents = () => {
     const [normalEvents, setNormalEvents] = useState([]);
@@ -12,14 +13,34 @@ const CreatedEvents = () => {
     const fetchUserCreatedEvents = async () => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get("http://localhost:5000/api/user-created-events", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            setNormalEvents(response.data.normalEvents);
-            setVotingEvents(response.data.votingEvents);
+            if (!token) {
+                console.error("No token found");
+                return;
+            }
+        
+            // Decode the token to extract role and email
+            const decodedToken = jwtDecode(token);
+            const { role, email } = decodedToken;
+        
+            // Set up headers with the token and user information
+            const config = {
+                headers: {
+                Authorization: `Bearer ${token}`,
+                'X-User-Role': role,
+                'X-User-Email': email,
+                },
+            };
+        
+            const response = await axios.get("http://127.0.0.1:5000/api/events", config);
+        
+            // Separate normal and voting events
+            const normalEvents = response.data.filter(event => event.eventType === "normal");
+            const votingEvents = response.data.filter(event => event.eventType === "voting");
+        
+            setNormalEvents(normalEvents);
+            setVotingEvents(votingEvents);
         } catch (error) {
-            console.error("Error fetching user-created events:", error);
+        console.error("Error fetching all events:", error);
         }
     };
 

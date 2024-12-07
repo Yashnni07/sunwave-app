@@ -3,6 +3,7 @@ import axios from "axios";
 import EventPopup from "../EventPopup/EventPopup";
 import "../Event/EventPage.css"; // Reuse EventPage styles
 import "../AdminUploadEvent/AdminUploadEventPage.css"; // Include upload styles
+import { jwtDecode } from "jwt-decode";
 
 const ModUploadEventPage = () => {
   const [events, setEvents] = useState([]); // All events
@@ -107,33 +108,79 @@ const ModUploadEventPage = () => {
       return;
     }
 
+     // Retrieve the token from localStorage
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setMessage("User is not authenticated.");
+      return;
+    }
+
+    // Decode the token to get the email
+    let creatorEmail;
     try {
+      const decodedToken = jwtDecode(token);
+      // Adjust the path based on your JWT payload structure
+      creatorEmail = decodedToken.email || decodedToken.user.email;
+    } catch (decodeError) {
+      console.error("Error decoding token:", decodeError);
+      setMessage("Invalid authentication token.");
+      return;
+    }
+
+    if (!creatorEmail) {
+      setMessage("Unable to retrieve user email from token.");
+      return;
+    }
+
+    try {
+      // Prepare the data to be sent to the backend
+      const eventData = {
+        ...formData,
+        creatorEmail, // Include creatorEmail in the request body
+        dateCreated: new Date().toISOString(), // Optionally add dateCreated
+      };
+  
+      // Make the POST request to the backend API
       const response = await axios.post(
-        "http://127.0.0.1:5000/api/moderator/upload-event",
-        formData,
+        "http://127.0.0.1:5000/api/post-events", // Updated API endpoint
+        eventData,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in headers if needed
+            'Content-Type': 'application/json',
+          },
         }
       );
-
-      // Refresh events after uploading a new event
-      await fetchEvents();
-
-      setMessage("Event uploaded successfully!");
-      setFormData({
-        title: "",
-        description: "",
-        date: "",
-        time: "",
-        image: "",
-        location: "",
-        eventType: "normal",
-        voteOptions: [],
-      });
-      setShowForm(false);
+  
+      // Check if the response is successful
+      if (response.status === 201) {
+        setMessage("Event uploaded successfully!");
+        
+        // Refresh events after uploading a new event
+        await fetchEvents();
+        
+        // Reset form fields
+        setFormData({
+          title: "",
+          description: "",
+          date: "",
+          time: "",
+          image: "",
+          location: "",
+          eventType: "normal",
+          voteOptions: [],
+        });
+        setShowForm(false);
+      } else {
+        setMessage("Unexpected response from the server.");
+      }
     } catch (error) {
       console.error("Error uploading event:", error);
-      setMessage("Failed to upload event.");
+      // Extract error message from response if available
+      const errorMsg =
+        error.response?.data?.message || "Failed to upload event.";
+      setMessage(errorMsg);
     }
   };
 

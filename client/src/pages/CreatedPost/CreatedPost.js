@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './CreatedPost.css';
+import { toast } from 'react-toastify';
 
 const CreatedPost = () => {
     const [userPosts, setUserPosts] = useState([]);
     const [editPost, setEditPost] = useState(null);
     const [updatedPost, setUpdatedPost] = useState({ title: '', content: '' });
+    const [loading, setLoading] = useState(false); // Add loading state
 
     const fetchUserPosts = async () => {
         try {
@@ -26,26 +28,53 @@ const CreatedPost = () => {
 
     const handleUpdate = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token'); // Ensure token is defined
+    
+            setLoading(true);  // Show loading spinner
+            
+            // Optimistic UI Update - Update the post in the local state immediately
+            setUserPosts((prevPosts) =>
+                prevPosts.map((post) =>
+                    post._id === editPost._id ? { ...post, ...updatedPost } : post
+                )
+            );
+    
+            // Send the update request to the backend
             await axios.put(`http://localhost:5000/api/posts/${editPost._id}`, updatedPost, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setEditPost(null);
-            fetchUserPosts();
+    
+            setLoading(false); // Hide loading spinner
+            setEditPost(null); // Reset the edit post state
+    
+            alert('Post updated successfully!');
+    
+            fetchUserPosts();  // Refetch posts from the backend if necessary
         } catch (error) {
+            setLoading(false); // Hide loading spinner
             console.error('Error updating post:', error);
+            alert('There was an error updating the post. Please try again later.');
         }
     };
 
     const handleDelete = async (id) => {
         try {
             const token = localStorage.getItem('token');
+            
+            // Optimistically remove the post from the UI
+            setUserPosts((prevPosts) => prevPosts.filter((post) => post._id !== id));
+    
+            // Send the delete request to the backend
             await axios.delete(`http://localhost:5000/api/posts/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            fetchUserPosts();
+    
+            toast.success('Post deleted successfully!');
+    
+            fetchUserPosts();  // Optionally, refetch posts from the backend if necessary
         } catch (error) {
             console.error('Error deleting post:', error);
+            toast.error('There was an error deleting the post. Please try again later.');
         }
     };
 
@@ -140,7 +169,9 @@ const CreatedPost = () => {
                             setUpdatedPost({ ...updatedPost, content: e.target.value })
                         }
                     ></textarea>
-                    <button onClick={handleUpdate}>Update</button>
+                    <button onClick={handleUpdate} disabled={loading}>
+                        {loading ? 'Updating...' : 'Update'}
+                    </button>
                     <button onClick={() => setEditPost(null)}>Cancel</button>
                 </div>
             )}

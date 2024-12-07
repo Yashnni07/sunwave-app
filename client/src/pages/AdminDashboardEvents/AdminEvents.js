@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./AdminEvents.css";
+import { jwtDecode } from 'jwt-decode'; // Import jwt-decode
 
 const AdminDashboard = () => {
   const [normalEvents, setNormalEvents] = useState([]);
@@ -11,21 +12,58 @@ const AdminDashboard = () => {
   // Fetch all events for admin
   const fetchAllEvents = async () => {
     try {
+     // Log to check if token exists
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/events", {
-        headers: { Authorization: `Bearer ${token}` },
+      if (!token) {
+        console.error("No token found in localStorage");
+        return;
+      }
+  
+      // Decode the token to extract role and email
+      const decodedToken = jwtDecode(token);
+      const { role, email } = decodedToken;
+  
+      // Log the decoded token information
+      console.log("Decoded Token:", { role, email });
+  
+      // Set up the data to be sent in the body
+      const requestData = {
+        role: role,
+        email: email,
+      };
+  
+      // Log the request data before sending it
+      console.log("Request data:", requestData);
+  
+      // Send the request to the backend (using  method)
+      const response = await axios.post("http://127.0.0.1:5000/api/events", requestData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // You can still send the token as a header for verification
+        },
       });
-
+  
+      // Log the raw response from the backend
+      console.log("Raw response from server:", response);
+  
       // Separate normal and voting events
       const normalEvents = response.data.filter(event => event.eventType === "normal");
       const votingEvents = response.data.filter(event => event.eventType === "voting");
-
+  
+      // Log the separated events
+      console.log("Normal Events:", normalEvents);
+      console.log("Voting Events:", votingEvents);
+  
+      // Update the state with the events
       setNormalEvents(normalEvents);
       setVotingEvents(votingEvents);
+  
+      // Log the state updates
+      console.log("State updated with normal events:", normalEvents);
+      console.log("State updated with voting events:", votingEvents);
     } catch (error) {
       console.error("Error fetching all events:", error);
     }
-  };
+  };  
 
   // Fetch joined users for a normal event
   const fetchJoinedUsers = async (eventId) => {
@@ -35,10 +73,13 @@ const AdminDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // Ensure the response is parsed as an array
+      const joinedUsers = JSON.parse(response.data);  // Ensure the response is parsed as an array
+
       setModalData({
         isOpen: true,
         type: "joinedUsers",
-        data: response.data,
+        data: joinedUsers,  // Set data as an array
       });
     } catch (error) {
       console.error("Error fetching joined users:", error);
@@ -68,7 +109,7 @@ const AdminDashboard = () => {
 
       const response = await axios.put(
         `http://localhost:5000/api/update-event/${eventId}`,
-        updatedData, // Must include `_id`, `_rev`, and `eventType`
+        updatedData, // 
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -227,7 +268,7 @@ const AdminDashboard = () => {
                       <strong>{option.option}</strong>: {option.votes} votes
                     </div>
                     <ul className="vote-list">
-                      {option.votedUsers.map((user, idx) => (
+                      {option.voters.map((user, idx) => (
                         <li key={idx}>{user.email}</li>
                       ))}
                     </ul>

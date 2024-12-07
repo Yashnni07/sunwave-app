@@ -32,7 +32,7 @@ const AdminUserPage = () => {
       // Update the local state after successful role change
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user.id === id ? { ...user, role: response.data.updatedUser.role } : user
+          user.email === id ? { ...user, role: response.data.updatedUser.role } : user
         )
       );
       setMessage(`Role updated successfully for User ID: ${id}`);
@@ -76,7 +76,7 @@ const AdminUserPage = () => {
         </thead>
         <tbody>
           {users.map((user, index) => (
-            <tr key={user.id}>
+            <tr key={user.email}>
               <td>{index + 1}</td>
               <td>{user.username || 'N/A'}</td>
               <td>{user.studentId || 'N/A'}</td>
@@ -87,7 +87,7 @@ const AdminUserPage = () => {
               <td>
                 <select
                   className="role-dropdown"
-                  onChange={(e) => handleChangeRole(user.id, e.target.value)}
+                  onChange={(e) => handleChangeRole(user.email, e.target.value)}
                   value={user.role}
                 >
                   <option value="User">User</option>

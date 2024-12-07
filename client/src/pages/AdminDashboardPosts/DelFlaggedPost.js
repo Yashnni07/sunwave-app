@@ -26,7 +26,7 @@ const DelFlaggedPost = () => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
+      await axios.delete(`http://localhost:5000/api/flagged-posts/${postId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
@@ -85,7 +85,7 @@ const DelFlaggedPost = () => {
                 <td>
                   <button
                     className="delete-btn"
-                    onClick={() => handleDelete(post._id)}
+                    onClick={() => handleDelete(post.postId)}
                   >
                     Delete
                   </button>

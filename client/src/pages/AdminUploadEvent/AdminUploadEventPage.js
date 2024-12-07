@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./AdminUploadEventPage.css";
+import { jwtDecode } from 'jwt-decode'; // Import jwt-decode
 
 const AdminUploadEventPage = () => {
   const [formData, setFormData] = useState({
@@ -32,7 +33,7 @@ const AdminUploadEventPage = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/api/events");
+      const response = await axios.get("http://127.0.0.1:5000/api/allevents");
       setEvents(response.data);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -99,15 +100,33 @@ const AdminUploadEventPage = () => {
   
     try {
       const dateCreated = new Date().toISOString();
+
+      // Retrieve the token (assuming it's stored in localStorage)
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setMessage("User is not authenticated.");
+        return;
+      }
+
+      // Decode the token to get the email
+      const decodedToken = jwtDecode(token);
+      const creatorEmail = decodedToken.email; // Adjust based on your JWT payload
+
+      if (!creatorEmail) {
+        setMessage("Unable to retrieve user email.");
+        return;
+      }
   
       const apiEndpoint =
         formData.eventType === "voting"
-          ? "http://127.0.0.1:5000/api/post-voting-events"
+          ? "http://127.0.0.1:5000/api/post-events"
           : "http://127.0.0.1:5000/api/post-events";
   
       const response = await axios.post(apiEndpoint, {
         ...formData,
         dateCreated,
+        creatorEmail,
       });
   
       setMessage("Event uploaded successfully!");

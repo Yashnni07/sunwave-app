@@ -266,7 +266,6 @@ function createChannel() {
   scripts/createChannel.sh $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE $bft_true
 }
 
-
 ## Call the script to deploy a chaincode to the channel
 function deployCC() {
   scripts/deployCC.sh
@@ -373,13 +372,7 @@ function networkDown() {
   if [ "$MODE" != "restart" ]; then
     # Bring down the network, deleting the volumes
     ${CONTAINER_CLI} volume rm docker_orderer.example.com docker_peer0.org1.example.com docker_peer0.org2.example.com
-    #Cleanup the chaincode containers
-
-    # Remove specific folders from ca_org1 Docker container
-    echo "Cleaning up folders in /etc/hyperledger/fabric-ca-server/ for ca_org1..."
-    ${CONTAINER_CLI} exec ca_org1 sh -c 'cd /etc/hyperledger/fabric-ca-server/ && rm -rf PATIENT* DOCTOR* PHARMACY*'
-    echo "Folders starting with PATIENT, DOCTOR, and PHARMACY removed from ca_org1."
-    
+    #Cleanup the chaincode container
     clearContainers
     #Cleanup images
     removeUnwantedImages

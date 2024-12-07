@@ -358,36 +358,45 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Resend OTP Code
 app.post("/resend-otp", async (req, res) => {
   const { email } = req.body;
 
   console.log("Received request body:", req.body); // Debugging log
 
   if (!email) {
-    console.error("Email is missing in the request body.");
-    return res.status(400).send({ message: "Email is required." });
+      console.error("Email is missing in the request body.");
+      return res.status(400).send({ message: "Email is required." });
   }
 
   try {
-    const user = await fetchUserByEmail(email);
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
-    }
+      // Fetch the user data from the ledger using the fetchUserByEmail function
+      const userJson = await contract.evaluateTransaction('fetchUserByEmail', email);
 
-    const newOtp = Math.floor(1000 + Math.random() * 9000);
-    await usersDb.insert({
-      ...user,
-      otp: newOtp,
-      _rev: user._rev,
-    });
-    await sendOtp(email, newOtp);
-    return res
-      .status(200)
-      .send({ message: "New OTP has been sent to your email" });
+      // If no user found in the ledger
+      if (!userJson || userJson.length === 0) {
+          console.log("No user found in ledger.");
+          return res.status(404).send({ message: "User not found" });
+      }
+
+      const user = JSON.parse(userJson.toString()); // Parse the user data
+      console.log("User found in ledger:", user);  // Debugging log
+
+      // Generate a new OTP
+      const newOtp = Math.floor(1000 + Math.random() * 9000);
+
+      // Prepare user data with the new OTP (we'll pass the OTP as part of the userData)
+      const updatedUserData = JSON.stringify({ otp: newOtp });
+
+      // Update the user OTP using the updateUser chaincode function
+      await contract.submitTransaction('updateUser', email, updatedUserData);
+
+      // Send OTP to the user's email (assuming sendOtp is a function you have for emailing)
+      await sendOtp(email, newOtp);
+
+      return res.status(200).send({ message: "New OTP has been sent to your email" });
   } catch (error) {
-    console.error("Error during resend OTP:", error);
-    return res.status(500).send({ message: "Failed to resend OTP" });
+      console.error("Error during resend OTP:", error);
+      return res.status(500).send({ message: "Failed to resend OTP" });
   }
 });
 

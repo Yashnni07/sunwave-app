@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Forum.css";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const ForumPage = () => {
   const [posts, setPosts] = useState([]); // Initialize as an empty array
@@ -20,6 +21,7 @@ const ForumPage = () => {
   const [imageError, setImageError] = useState(""); // Manage image validation errors
   const [imageLoaded, setImageLoaded] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState({});
+  const [loading, setLoading] = useState(false);
 
   // Function to fetch posts from the server
   const fetchPosts = async () => {
@@ -195,37 +197,59 @@ const renderPosts = () =>
   const handlePostSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+
+    // Create post data object
     const postData = {
-      title: newPost.title,
-      content: newPost.content,
-      image: newPost.image,
-      username: user.username,
-      email: user.email,
-      studentId: user.studentId, // Include studentId here
+        title: newPost.title,
+        content: newPost.content,
+        image: newPost.image,
+        username: user.username,
+        email: user.email,
+        studentId: user.studentId, // Include studentId here
     };
 
     console.log("Post Data:", postData); // Debugging log
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/posts",
-        postData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        // Show loading indicator
+        setLoading(true);
 
-      console.log("Created post:", response.data); // Debugging log
-      setPosts((prevPosts) => [response.data, ...prevPosts]);
-      setNewPost({ title: "", content: "", image: null }); // Reset the post form
-      setImageLoaded(false); // Reset image loaded state
+        // Submit post to the server
+        const response = await axios.post("http://localhost:5000/posts", postData, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("Created post:", response.data); // Debugging log
+
+        // After the post is created, fetch all posts again to get the updated list
+        const updatedPostsResponse = await axios.get("http://localhost:5000/posts", {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("Updated posts:", updatedPostsResponse.data);
+
+        // Update the posts list with the newly fetched posts
+        setPosts(updatedPostsResponse.data);
+
+        // Reset the form and state
+        setNewPost({ title: "", content: "", image: null });
+        setImageLoaded(false);
+        
+        // Show success feedback
+        toast.success('Post created successfully!');
     } catch (error) {
-      console.error(
-        "Error creating post:",
-        error.response?.data || error.message
-      );
+        setLoading(false);
+
+        console.error("Error creating post:", error.response?.data || error.message);
+
+        // Show error feedback
+        toast.error('There was an error creating your post. Please try again.');
+    } finally {
+        // Hide the loading spinner
+        setLoading(false);
     }
-  };
+};
+
 
   const handleCommentChange = (e) => {
     setComment(e.target.value);
@@ -233,21 +257,51 @@ const renderPosts = () =>
 
   const addComment = async (postId) => {
     const token = localStorage.getItem("token");
+
+    // Early return if no token is found
+    if (!token) {
+        console.error("No token found");
+        return;
+    }
+
     try {
-      await axios.post(
-        `http://localhost:5000/posts/${postId}/comments`,
-        {
-          text: comment,
-          username: user.username,
-          email: user.email,
-          studentId: user.studentId,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setComment(""); // Clear the comment input
-      await fetchPosts(); // Refresh posts dynamically
+        const commentData = {
+            text: comment,
+            username: user.username,
+            email: user.email,
+            studentId: user.studentId,
+            createdAt: new Date().toISOString(), // Add the current date to the comment
+        };
+
+        // Optimistic UI Update: Add the comment locally before the API call
+        setPosts((prevPosts) =>
+            prevPosts.map((post) =>
+                post.postId === postId
+                    ? {
+                          ...post,
+                          comments: [...post.comments, commentData], // Add comment locally
+                      }
+                    : post
+            )
+        );
+
+        // Send the API request to add the comment
+        await axios.post(
+            `http://localhost:5000/posts/${postId}/comments`,
+            commentData, // Send the comment data
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // Clear the comment input field after submission
+        setComment("");
+
+        // Refresh the posts dynamically
+        await fetchPosts();
     } catch (error) {
-      console.error("Error adding comment:", error);
+        console.error("Error adding comment:", error);
+
+        // Optionally display an error message
+        alert("There was an error adding your comment. Please try again later.");
     }
   };
 
@@ -445,16 +499,16 @@ const renderPosts = () =>
                   {toggleComments[post._id] && (
                     <div className="comment-section">
                       {Array.isArray(post.comments) && post.comments.length > 0 ? (
-                        post.comments.map((comment, index) => (
-                          <div className="comment" key={index}>
-                            <strong>
-                              {comment.username || "Anonymous"} ({comment.studentId || "N/A"}):
-                            </strong>{" "}
-                            {comment.text}
-                          </div>
-                        ))
-                      ) : (
-                        <p>No comments yet. Be the first to comment!</p>
+                            post.comments.map((comment, index) => (
+                              <div className="comment" key={index}>
+                                <strong>
+                                  {comment.username || "Anonymous"} ({comment.studentId || "N/A"}):
+                                </strong>{" "}
+                                {comment.text}
+                              </div>
+                            ))
+                          ) : (
+                            <div>No comments yet.</div> // In case there are no comments
                       )}
                       <textarea
                         placeholder="Write a comment..."

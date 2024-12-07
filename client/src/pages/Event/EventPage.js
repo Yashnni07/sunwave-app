@@ -12,7 +12,7 @@ const EventPage = () => {
   // Fetch events from the backend API
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/events")
+      .get("http://localhost:5000/api/allevents")
       .then((response) => setEvents(response.data))
       .catch((error) => console.error("Error fetching events:", error));
   }, []);

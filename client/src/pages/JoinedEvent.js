@@ -14,23 +14,16 @@ const JoinedEventsPage = () => {
   useEffect(() => {
     const fetchJoinedEvents = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/user/joined-events",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        // Assuming the response includes an array of full event data
-        setJoinedEvents(
-          response.data.joinedEvents.map((event) => ({
-            ...event,
-            isJoined: true, // Mark these events as joined
-            isVoted: false, // Optional: Update this if needed
-          }))
-        );
+        // Fetch joined events from the backend API
+        const response = await axios.get("http://localhost:5000/api/user/joined-events", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Pass the token in headers
+          },
+        });
+  
+        // Assuming the backend returns the event data in the correct structure
+        setJoinedEvents(response.data.joinedEvents); // Directly set the event data
+  
       } catch (err) {
         console.error("Error fetching joined events:", err);
         setError("Failed to load joined events.");
@@ -38,9 +31,11 @@ const JoinedEventsPage = () => {
         setLoading(false);
       }
     };
-
+  
+    // Call the function to fetch the data
     fetchJoinedEvents();
   }, []);
+  
 
   // Handle when an event is clicked
   const handleDetailsClick = (event) => {
@@ -125,18 +120,17 @@ const JoinedEventsPage = () => {
         )}
       </div>
 
+      {/* Event Popup */}
       {isPopupOpen && selectedEvent && (
         <EventPopup
-          title={selectedEvent.title || "No Title"}
-          description={selectedEvent.description || ""}
-          location={selectedEvent.location || "No Location"}
-          time={selectedEvent.time || "No Time"}
-          imageUrl={selectedEvent.image || "/placeholder.jpg"}
-          eventType={selectedEvent.eventType || "General"}
-          voteOptions={selectedEvent.voteOptions || []}
-          eventId={selectedEvent.eventId}
-          isJoined={selectedEvent.isJoined} // Pass isJoined directly
-          isVoted={selectedEvent.isVoted} // Optional: Pass isVoted if needed
+          title={selectedEvent.title}
+          description={selectedEvent.description}
+          location={selectedEvent.location}
+          time={selectedEvent.time}
+          imageUrl={selectedEvent.image}
+          eventType={selectedEvent.eventType}
+          voteOptions={selectedEvent.voteOptions}
+          eventId={selectedEvent._id}
           onClose={handleClosePopup}
         />
       )}

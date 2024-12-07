@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode'; // To decode the JWT token
 import './ProfilePage.css';
 
 const ProfilePage = () => {
@@ -15,57 +16,104 @@ const ProfilePage = () => {
     program: '',
     intake: '',
   });
-  const [isEditing, setIsEditing] = useState(false); // Toggle for editing mode
+  const [isEditing, setIsEditing] = useState(false);
   const [updatedDetails, setUpdatedDetails] = useState({});
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('Token from localStorage:', token);
+
     if (!token) {
-      navigate('/login'); // Redirect to login if not authenticated
-      return;
-    }
-
-    axios
-      .get('http://localhost:5000/api/role-details', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setUserDetails((prevDetails) => ({
-          ...prevDetails,
-          ...response.data,
-        }));
-        setUpdatedDetails(response.data); // Prepare for editing
-      })
-      .catch((error) => {
-        console.error('Error fetching user details:', error);
-        navigate('/login');
-      })
-      .finally(() => setLoading(false));
-  }, [navigate]);
-
-  const handleSaveChanges = async () => {
-    const token = localStorage.getItem('token');
-    if (!userDetails.id) {
-      setMessage('User ID is missing.');
-      console.error('User ID is missing.');
+      setMessage('No token found. Please log in.');
+      setLoading(false);
       return;
     }
 
     try {
+      const decodedToken = jwtDecode(token); // Decode JWT token
+      console.log('Decoded Token:', decodedToken);
+
+      const userId = decodedToken.email;
+      console.log('Decoded User ID:', userId);
+
+      if (!userId) {
+        setMessage('User ID is missing in the token.');
+        setLoading(false);
+        return;
+      }
+
+      // Check if the token has expired
+      const currentTime = Date.now() / 1000; // Current time in seconds
+      console.log('Current Time (seconds):', currentTime);
+      console.log('Token Expiration Time (seconds):', decodedToken.exp);
+
+      if (decodedToken.exp < currentTime) {
+        setMessage('Token expired. Please log in again.');
+        setLoading(false);
+        return;
+      }
+
+      // Fetch user details using the decoded userId
+      axios
+        .get('http://localhost:5000/api/role-details', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          console.log('API Response:', response.data);
+
+          setUserDetails((prevDetails) => ({
+            ...prevDetails,
+            ...response.data,
+          }));
+          setUpdatedDetails(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching user details:', error);
+          setMessage('Failed to fetch user details. Please try again.');
+        })
+        .finally(() => setLoading(false));
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      setMessage('Invalid token. Please log in again.');
+      setLoading(false);
+    }
+  }, [navigate]);
+
+  const handleSaveChanges = async () => {
+    const token = localStorage.getItem('token');
+    console.log('Token during Save Changes:', token);
+
+    if (!token) {
+      setMessage('No token found. Please log in.');
+      return;
+    }
+
+    try {
+      const decodedToken = jwtDecode(token); // Decode JWT token
+      console.log('Decoded Token:', decodedToken);
+
+      const userId = decodedToken.email;
+      console.log('Decoded User ID:', userId);
+
+      if (!userId) {
+        setMessage('User ID is missing.');
+        return;
+      }
+
       await axios.put(
-        `http://localhost:5000/api/users/${userDetails.id}`, // Update user in database
+        `http://localhost:5000/api/users/${userId}`,
         updatedDetails,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setUserDetails(updatedDetails); // Update the UI
+      setUserDetails(updatedDetails);
       setMessage('Profile updated successfully.');
-      setIsEditing(false); // Exit editing mode
+      setIsEditing(false);
     } catch (error) {
       console.error('Error saving changes:', error);
-      setMessage('Failed to update profile.');
+      setMessage('Failed to update profile. Please try again.');
     }
   };
 
