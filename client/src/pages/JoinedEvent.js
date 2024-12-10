@@ -130,7 +130,7 @@ const JoinedEventsPage = () => {
           imageUrl={selectedEvent.image}
           eventType={selectedEvent.eventType}
           voteOptions={selectedEvent.voteOptions}
-          eventId={selectedEvent._id}
+          eventId={selectedEvent.eventId}
           onClose={handleClosePopup}
         />
       )}

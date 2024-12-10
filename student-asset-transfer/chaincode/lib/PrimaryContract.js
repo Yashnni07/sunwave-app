@@ -285,7 +285,7 @@ class PrimaryContract extends Contract {
         return JSON.stringify(results);
     }
 
-    async getAllEvents(ctx, eventType, creatorEmail = null) {
+    async getAllEvents(ctx, eventType, creatorEmail) {
         // Build the selector based on whether creatorEmail is provided
         const selector = {
             eventType: eventType,
@@ -955,26 +955,26 @@ class PrimaryContract extends Contract {
         // Fetch the post from the blockchain
         const postAsBytes = await ctx.stub.getState(postId);
         if (!postAsBytes || postAsBytes.length === 0) {
-        throw new Error(`Post with ID ${postId} not found`);
+            throw new Error(`POST_NOT_FOUND: Post with ID ${postId} not found`);
         }
-    
+
         const post = JSON.parse(postAsBytes.toString()); // Parse the post object
-    
+
         // Check if the user has already flagged the post
         if (post.flaggedBy && post.flaggedBy.includes(userEmail)) {
-        throw new Error(`Post has already been flagged by the user ${userEmail}`);
+            throw new Error(`ALREADY_FLAGGED: Post has already been flagged by the user ${userEmail}`);
         }
-    
+
         // Add the user to the flaggedBy array and update flagVerified and flagCount
         post.flaggedBy = [...(post.flaggedBy || []), userEmail];
         post.flagVerified = true; // Mark the post as flagged
         post.flagCount = post.flaggedBy.length; // Update the flag count
-    
+
         // Save the updated post back to the blockchain
         await ctx.stub.putState(postId, Buffer.from(JSON.stringify(post)));
-    
+
         return JSON.stringify({ message: 'Post flagged successfully' });
-    }    
+    }
 
     // Fetch Flagged Posts
     async fetchFlaggedPosts(ctx) {

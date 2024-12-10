@@ -12,9 +12,10 @@ const CreatedEvents = () => {
     // Fetch all events created by the user
     const fetchUserCreatedEvents = async () => {
         try {
+            // Log to check if token exists
             const token = localStorage.getItem("token");
             if (!token) {
-                console.error("No token found");
+                console.error("No token found in localStorage");
                 return;
             }
         
@@ -22,23 +23,42 @@ const CreatedEvents = () => {
             const decodedToken = jwtDecode(token);
             const { role, email } = decodedToken;
         
-            // Set up headers with the token and user information
-            const config = {
-                headers: {
-                Authorization: `Bearer ${token}`,
-                'X-User-Role': role,
-                'X-User-Email': email,
-                },
-            };
+            // Log the decoded token information
+            console.log("Decoded Token:", { role, email });
         
-            const response = await axios.get("http://127.0.0.1:5000/api/events", config);
+            // Set up the data to be sent in the body
+            const requestData = {
+                role: role,
+                email: email,
+            };
+
+            // Log the request data before sending it
+            console.log("Request data:", requestData);
+        
+            // Send the request to the backend (using  method)
+            const response = await axios.post("http://127.0.0.1:5000/api/events", requestData, {
+                headers: {
+                Authorization: `Bearer ${token}`, // You can still send the token as a header for verification
+                },
+            });
+        
+            // Log the raw response from the backend
+            console.log("Raw response from server:", response);
         
             // Separate normal and voting events
             const normalEvents = response.data.filter(event => event.eventType === "normal");
             const votingEvents = response.data.filter(event => event.eventType === "voting");
+  
+            // Log the separated events
+            console.log("Normal Events:", normalEvents);
+            console.log("Voting Events:", votingEvents);
         
             setNormalEvents(normalEvents);
             setVotingEvents(votingEvents);
+
+            // Log the state updates
+            console.log("State updated with normal events:", normalEvents);
+            console.log("State updated with voting events:", votingEvents);
         } catch (error) {
         console.error("Error fetching all events:", error);
         }
@@ -225,14 +245,29 @@ const CreatedEvents = () => {
                             ×
                         </button>
                         {modalData.type === "joinedUsers" && modalData.data && (
-                            <div className="modal-container">
-                                <h3>Joined Users</h3>
-                                <ul className="user-list">
-                                    {modalData.data.map((user, index) => (
-                                        <li key={index}>{user.email}</li>
-                                    ))}
-                                </ul>
-                            </div>
+                        <div className="modal-container">
+                            <h3>Joined Users</h3>
+                            <table className="joined-users-table">
+                            <thead>
+                                <tr>
+                                <th>No.</th>
+                                <th>Username</th>
+                                <th>User ID</th>
+                                <th>Student ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {modalData.data.map((user, index) => (
+                                <tr key={user.userId}>
+                                    <td>{index + 1}</td>
+                                    <td>{user.username}</td>
+                                    <td>{user.userId}</td>
+                                    <td>{user.studentId}</td>
+                                </tr>
+                                ))}
+                            </tbody>
+                            </table>
+                        </div>
                         )}
                         {modalData.type === "votingResults" && modalData.data && (
                             <div className="modal-container voting-results">

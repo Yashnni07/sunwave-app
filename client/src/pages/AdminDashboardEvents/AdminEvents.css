@@ -280,3 +280,29 @@ form textarea {
   padding-left: 20px;
   list-style-type: disc;
 }
+
+.joined-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.joined-users-table th,
+.joined-users-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.joined-users-table thead {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.joined-users-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.joined-users-table tr:hover {
+  background-color: #f5f5f5;
+}

@@ -317,10 +317,14 @@ const renderPosts = () =>
         }
       );
   
-      if (response.data.message === "Post already flagged by this user") {
+      if (response.data.message === "You have already flagged this post.") {
         alert("You have already flagged this post.");
-      } else {
+      } else if (response.data.message === "Post flagged successfully") {
         alert("Post flagged successfully.");
+      } else if (response.data.message === "Post not found.") {
+        alert("The post you are trying to flag does not exist.");
+      } else {
+        alert(response.data.message); // Handle other possible messages
       }
     } catch (error) {
       console.error("Error flagging post:", error);

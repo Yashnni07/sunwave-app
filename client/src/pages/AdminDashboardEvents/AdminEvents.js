@@ -73,13 +73,22 @@ const AdminDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Ensure the response is parsed as an array
-      const joinedUsers = JSON.parse(response.data);  // Ensure the response is parsed as an array
+      console.log(response.headers['content-type']);
+
+        // Log the raw response to debug
+        console.log('API Response:', response);
+
+        // Now, check the structure of the response
+        if (response && response.data) {
+          console.log('Data:', response.data);
+        } else {
+          console.error('No data received');
+        }
 
       setModalData({
         isOpen: true,
         type: "joinedUsers",
-        data: joinedUsers,  // Set data as an array
+        data: response.data,  // Set data as an array
       });
     } catch (error) {
       console.error("Error fetching joined users:", error);
@@ -252,11 +261,26 @@ const AdminDashboard = () => {
             {modalData.type === "joinedUsers" && modalData.data && (
               <div className="modal-container">
                 <h3>Joined Users</h3>
-                <ul className="user-list">
-                  {modalData.data.map((user, index) => (
-                    <li key={index}>{user.email}</li>
-                  ))}
-                </ul>
+                <table className="joined-users-table">
+                  <thead>
+                    <tr>
+                      <th>No.</th>
+                      <th>Username</th>
+                      <th>User ID</th>
+                      <th>Student ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {modalData.data.map((user, index) => (
+                      <tr key={user.userId}>
+                        <td>{index + 1}</td>
+                        <td>{user.username}</td>
+                        <td>{user.userId}</td>
+                        <td>{user.studentId}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
             {modalData.type === "votingResults" && modalData.data && (

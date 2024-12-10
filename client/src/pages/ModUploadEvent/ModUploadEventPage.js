@@ -37,7 +37,7 @@ const ModUploadEventPage = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/api/events");
+      const response = await axios.get("http://127.0.0.1:5000/api/allevents");
       setEvents(response.data);
     } catch (error) {
       console.error("Error fetching events:", error);

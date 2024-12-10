@@ -812,8 +812,8 @@ app.post("/api/events", authenticateToken, async (req, res) => {
       votingEventsBuffer = await contract.evaluateTransaction('getEvents', 'voting');
     } else if (role === 'Moderator') {
       // Moderators get events created by their email
-      normalEventsBuffer = await contract.evaluateTransaction('getAllEventsByCreator', 'normal', email);
-      votingEventsBuffer = await contract.evaluateTransaction('getAllEventsByCreator', 'voting', email);
+      normalEventsBuffer = await contract.evaluateTransaction('getAllEvents', 'normal', email);
+      votingEventsBuffer = await contract.evaluateTransaction('getAllEvents', 'voting', email);
     } else {
       return res.status(403).send({ message: "Access denied" });
     }
@@ -881,8 +881,8 @@ app.post("/api/events", authenticateToken, async (req, res) => {
 app.get("/api/allevents", async (req, res) => {
   try {
     // Fetch events from the contract (normal and voting)
-    const normalEventsBuffer = await contract.evaluateTransaction('getAllEvents', 'normal');
-    const votingEventsBuffer = await contract.evaluateTransaction('getAllEvents', 'voting');
+    const normalEventsBuffer = await contract.evaluateTransaction('getEvents', 'normal');
+    const votingEventsBuffer = await contract.evaluateTransaction('getEvents', 'voting');
 
     // Log the raw buffer data for debugging
     console.log('Normal Events Buffer:', normalEventsBuffer);
@@ -1160,6 +1160,8 @@ app.get("/api/user/joined-events", authenticateToken, async (req, res) => {
               time: event.time,
               location: event.location,
               status: event.status,
+              image: event.image,
+              eventType: event.eventType,
           };
       });
 
@@ -1225,7 +1227,7 @@ app.post("/posts/:id/comments", authenticateToken, async (req, res) => {
   const commentData = req.body;  // The entire comment object
   
   // Optional: validate the structure of the commentData to ensure it's a valid object
-  if (!commentData || !commentData.text || !commentData.username || !commentData.studentId) {
+  if (!commentData || !commentData.text || !commentData.username) {
     return res.status(400).send({
       message: "Invalid comment data",
     });
@@ -1443,7 +1445,7 @@ app.post('/api/remove-saved-post', authenticateToken, async (req, res) => {
   }
 });
 
-// Flag Post
+// Flag Post Route
 app.post("/api/flag-post", authenticateToken, async (req, res) => {
   const { postId } = req.body;
   const userEmail = req.user.email;
@@ -1453,16 +1455,52 @@ app.post("/api/flag-post", authenticateToken, async (req, res) => {
     const flagPostResponse = await contract.submitTransaction('flagPost', postId, userEmail);
     
     // Parse the response from chaincode
-    const response = Buffer.from(response).toString();
+    const response = JSON.parse(Buffer.from(flagPostResponse).toString());
 
     // Send success response with the message returned by the chaincode
     res.status(200).json({ message: response.message });
 
   } catch (error) {
     console.error("Error flagging post:", error);
-    res.status(500).json({ message: "Failed to flag post", error: error.message });
+
+    // Initialize a variable to hold the user-friendly message
+    let userMessage = "Failed to flag post.";
+
+    // Check if the error has 'details' and extract the chaincode message
+    if (error.details && Array.isArray(error.details) && error.details.length > 0) {
+      const chaincodeErrorMessage = error.details[0].message;
+
+      // Log the chaincode error message for debugging
+      console.error("Chaincode Error Message:", chaincodeErrorMessage);
+
+      // Check for specific error messages from chaincode
+      if (chaincodeErrorMessage.includes("Post has already been flagged by the user")) {
+        userMessage = "You have already flagged this post.";
+      } else if (chaincodeErrorMessage.includes("Post with ID")) {
+        userMessage = "Post not found.";
+      }
+    } else if (error.message) {
+      // Fallback to checking the main error message if 'details' are not available
+      if (error.message.includes("ALREADY_FLAGGED:")) {
+        userMessage = "You have already flagged this post.";
+      } else if (error.message.includes("POST_NOT_FOUND:")) {
+        userMessage = "Post not found.";
+      }
+    }
+
+    // Determine the appropriate HTTP status code
+    let statusCode = 500; // Default to Internal Server Error
+    if (userMessage === "You have already flagged this post.") {
+      statusCode = 200; // OK, but inform the user
+    } else if (userMessage === "Post not found.") {
+      statusCode = 404; // Not Found
+    }
+
+    // Send the appropriate response
+    res.status(statusCode).json({ message: userMessage });
   }
 });
+
 
 // GET Flagged Posts
 app.get("/api/flagged-posts", authenticateToken, async (req, res) => {

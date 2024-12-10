@@ -81,16 +81,7 @@ const SavedPostPage = () => {
 
                                 {/* Post Title with Link */}
                                 <td>
-                                    <a
-                                        href={`/forum?postId=${post._id}`}
-                                        className="post-title-link"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            navigateToForumPost(post._id); // Scrolls to the post in the forum page
-                                        }}
-                                    >
-                                        {post.title}
-                                    </a>
+                                    {post.title}
                                 </td>
 
                                 {/* Post Content */}

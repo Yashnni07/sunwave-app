@@ -153,15 +153,44 @@ const EventPopup = ({
         setIsVoted(true); // Mark the user as having voted
         setErrorMessage(""); // Clear any previous errors
 
-        // Update voteCounts in state with the new data from the response
-        const updatedEvent = response.data.updatedEvent;
-        const updatedCounts = updatedEvent.voteOptions.reduce((acc, option) => {
-          acc[option.name] = option.votes;
-          return acc;
-        }, {});
-        setVoteCounts(updatedCounts);
+        // Update vote counts by incrementing the selected option
+        setVoteCounts(prevCounts => ({
+          ...prevCounts,
+          [selectedVotes[0]]: (prevCounts[selectedVotes[0]] || 0) + 1
+        }));
 
-        console.log("Vote submitted successfully:", response.data);
+        let eventData;
+        // Fetch voting event details
+        const response = await axios.get(`${API_BASE_URL}/voting-event/${eventId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        eventData = response.data;
+
+        if (eventData) {
+          if (eventType === "voting") {
+            // For voting events, handle joinedUsers and voting logic
+            const joined = eventData.joinedUsers && eventData.joinedUsers.some(user => user.email === userEmail);
+            setIsJoined(joined);
+            console.log("User has joined (voting):", joined);
+
+            const voted = eventData.voteOptions.some(option =>
+              option.votedUsers.includes(userEmail)
+            );
+            setIsVoted(voted);
+            console.log("User has voted:", voted);
+
+            const counts = eventData.voteOptions.reduce((acc, option) => {
+              acc[option.name] = option.votes;
+              return acc;
+            }, {});
+            setVoteCounts(counts);
+            console.log("Vote Counts:", counts);
+          }
+        }
+
+
       } else {
         setErrorMessage("Failed to submit vote.");
         setHasError(true);
