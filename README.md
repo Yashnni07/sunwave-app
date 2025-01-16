@@ -116,9 +116,10 @@ cd server
 node server.js
 ```
 
-5. Run the react module
+5. Run the react module for bringing up the frontend of the system
 
 ```bash
+cd client
 npm start
 ```
 
